@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OU Container Builder ContainerConfig.yaml Generator</title>
+  <style>
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .sub-section {
+      margin-left: 20px;
+    }
+
+    .inner-section>div {
+      border: 1px solid #000000;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 5px;
+      margin: 5px;
+      background: #ddd;
+      border-radius: 3px;
+    }
+
+    .tag .delete {
+      cursor: pointer;
+      margin-left: 5px;
+      color: red;
+    }
+
+    button {
+      margin-top: 10px;
+    }
+
+    #yaml-preview {
+      white-space: pre;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 20px;
+    }
+
+    #yaml-import-container {
+      display: none;
+      margin-bottom: 20px;
+    }
+
+    #yaml-import-textarea {
+      width: 100%;
+      height: 200px;
+    }
+
+    /* Style for a disabled button */
+    .disabled-button {
+      background-color: #cccccc;
+      color: #666666;
+      border: 1px solid #aaaaaa;
+      cursor: not-allowed;
+    }
+
+    .fixed-rows-textarea {
+resize: horizontal; /* Allow only horizontal resizing */
+            overflow: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>OU Container Builder ContainerConfig.yaml Generator</h1>
+  <div>
+    <p>Convenience tool for helping and manage <tt>ContainerConfig.yaml</tt> files.</p>
+    <p>Official OU Container builder docs <a href="https://docs.ocl.open.ac.uk/container-builder/v3/">here</a>.</p>
+  </div>
+  If you have a pre-existing YAML file, you can seed this from from it (this will clear all previous form elements):
+  <button type="button" onclick="showImportTextarea()">Import YAML</button>
+  <div id="yaml-import-container">
+    <textarea id="yaml-import-textarea" cols=60 rows=10 placeholder="Paste your YAML here"></textarea><br />
+    <button type="button" onclick="importYAML()">Import</button>
+    <button type="button" onclick="hideImportTextarea()">Cancel</button>
+  </div>
+  <form id="settingsForm">
+
+    <div class="section">
+      <h2>Module</h2>
+      <div class="tips">Enter the module code (for example, <tt>XY123</tt>),
+        and presentation code based on year (last two digits) and month code (for example, <tt>24J</tt>
+        for October (tenth month, tenth letter of alphabet (J)) 2024).</div>
+      <label for="module-code">Code:</label>
+      <input type="text" id="module-code" name="module-code" /><br />
+      <label for="module-presentation">Presentation:</label>
+      <input type="text" id="module-presentation" name="module-presentation" /><br />
+    </div>
+
+    <div class="section">
+      <h2>Image</h2>
+      <div class="tips"></div>
+      <label for="image">Base:</label>
+      <input type="text" id="image-base" name="image-base" /><br />
+      <label for="image-user">User:</label>
+      <input type="text" id="image-user" name="image-user" /><br />
+    </div>
+
+    <div class="section">
+      <h2>Server</h2>
+      <label for="access-token">Access Token:</label>
+      <input type="text" id="access-token" name="access-token" /><br />
+      <label for="default-path">Default Path:</label>
+      <textarea class="fixed-rows-textarea" type="text" id="default-path" name="default-path"></textarea><br />
+    </div>
+
+    <div class="section">
+      <h2>Content</h2>
+      <div id="content-section" class="inner-section">
+      </div>
+      <button type="button" onclick="addContent()">Add Content</button><br />
+    </div>
+
+    <div class="section">
+      <h2>Readymades</h2>
+      <p><em>Readymades</em> are simple</em> pre-defined configurations that add the necessary packages
+        to a build to provide a particular service or configure part of the build in a particular way.</p>
+      <p><em>Readymades</em> are loaded in from predefined fragments of container builder YAML configuration files.</p>
+      <div class="sub-section">
+        <h3>Services and application readymades</h3>
+        <!-- We disable a button after it has been pressed. -->
+        <button type="button" onclick="disableButton(this); addReadyMadeMongo();">
+          Add Mongo
+        </button>
+        <button type="button" onclick=" disableButton(this); addReadyMadePostgres();">
+          Add PostgreSQL
+        </button>
+        <button type="button" onclick="disableButton(this); addReadyMadeOpenRefine();">
+          Add OpenRefine
+        </button>
+        <h3>User environment readymades</h3>
+        <button type="button" onclick="disableButton(this); addReadyMadeOUsefulJL();">
+          Add OUseful JupyterLab Extensions
+        </button>
+        <h3>Computing environment readymades</h3>
+        <button type="button" onclick="disableButton(this); addReadyMadeOUsefulgeopy();">
+          Add OUseful Geo Computing tools (Py)
+        </button>
+        <button type="button" onclick="disableButton(this); addReadyMadeOUsefuldatascipy();">
+          Add OUseful Data Science tools (Py)
+        </button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Packs</h2>
+      <div class="tips"></div>
+      <input type="checkbox" id="jupyterlab" name="packs" value="jupyterlab" />
+      <label for="jupyterlab">JupyterLab</label><br />
+      <input type="checkbox" id="notebook" name="packs" value="notebook" />
+      <label for="notebook">Notebook</label><br />
+      <input type="checkbox" id="ipykernel" name="packs" value="ipykernel" />
+      <label for="ipykernel">IPyKernel</label><br />
+      <input type="checkbox" id="irkernel" name="packs" value="irkernel" />
+      <label for="irkernel">IRKernel</label><br />
+      <input type="checkbox" id="code_server" name="packs" value="code_server" />
+      <label for="code_server">Code Server</label><br />
+      <input type="checkbox" id="xfce4" name="packs" value="xfce4" />
+      <label for="xfce4">XFCE4 desktop GUI</label><br />
+    </div>
+
+    <div class="section">
+      <h2>Sources</h2>
+      <h3>APT</h3>
+      <div id="sources-apt" class="inner-section">
+      </div>
+      <button type="button" onclick="addAptSource()">Add APT Source</button>
+    </div>
+
+    <div class="section">
+      <h2>Packages</h2>
+      <div class="sub-section">
+        <h3>APT Build</h3>
+        <textarea class="fixed-rows-textarea" rows=1 cols="60" id="apt-build-input" placeholder="Enter APT packages, separated by comma or space" ></textarea>
+        <br><button type="button" onclick="addAptPackages('build')">
+          Add Packages
+        </button>
+        <div id="apt-build-packages"></div>
+      </div>
+      <div class="sub-section">
+        <h3>APT Deploy</h3>
+        <textarea class="fixed-rows-textarea" rows=1 cols="60" id="apt-deploy-input" placeholder="Enter APT packages, separated by comma or space" ></textarea>
+        <br><button type="button" onclick="addAptPackages('deploy')">
+          Add Packages
+        </button>
+        <div id="apt-deploy-packages"></div>
+      </div>
+      <div class="sub-section">
+        <h3>PIP System</h3>
+        <label for="pip-system-requirements">Requirements file:</label>
+        <textarea class="fixed-rows-textarea" rows=1 cols="40" id="pip-system-requirements" name="pip-system-requirements" placeholder="Path to requirements file"></textarea><br />
+        <div id="pip-system-package-buttons">
+          <!-- Buttons will be dynamically added here -->
+        </div><br>
+        <textarea class="fixed-rows-textarea" rows=1 cols="60" id="pip-system-input" placeholder="Enter PIP packages, separated by comma or space" ></textarea>
+        <br><button type="button" onclick="addPipPackages('system')">Add Packages</button>
+        <div id="pip-system-packages"></div>
+      </div>
+      <div class="sub-section">
+        <h3>PIP User</h3>
+        <label for="pip-user-requirements">Requirements file:</label>
+        <textarea class="fixed-rows-textarea" rows=1 cols="40" id="pip-user-requirements" name="pip-user-requirements" placeholder="Path to requirements file"></textarea><br />
+        <div id="pip-user-package-buttons">
+          <!-- Buttons will be dynamically added here -->
+        </div><br>
+        <textarea class="fixed-rows-textarea" rows=1 cols="60" id="pip-user-input" placeholder="Enter PIP packages, separated by comma or space" ></textarea>
+        <br><button type="button" onclick="addPipPackages('user')">Add Packages</button>
+        <div id="pip-user-packages"></div>
+      </div>
+    </div>
+    </div>
+
+    <div class="section">
+      <h2>Web Apps</h2>
+      <div id="web-apps-section" class="inner-section">
+      </div>
+      <button type="button" onclick="addWebApp()">Add Web App</button><br />
+    </div>
+
+    <div class="section">
+      <h2>Scripts</h2>
+      <div id="scripts-section" class="inner-section">
+      </div>
+      <button type="button" onclick="addScript()">Add Script</button><br>
+    </div>
+
+    <div class="section">
+      <h2>Services</h2>
+      <textarea class="fixed-rows-textarea" rows=1 cols="40" id="services-input"
+        placeholder="Enter service name, or service names separated by comma or space" ></textarea><br><br>
+      <button type="button" onclick="addService()">
+        Add Service(s)
+      </button>
+      <div id="service-names"></div>
+    </div>
+
+    <div class="section">
+      <h2>Environment</h2>
+      <div id="environment-section" class="inner-section">
+      </div>
+      <button type="button" onclick="addEnvironment()">
+        Add Environment Variable</button><br /><br />
+    </div>
+
+    <div class="section">
+      <h2>Arguments</h2>
+
+      <div id="arguments-section" class="inner-section">
+      </div>
+      <button type="button" onclick="addArgument()">
+        Add Argument</button><br /><br />
+    </div>
+
+    <div class="section">
+      <h2>Output Blocks</h2>
+
+      <div id="output-blocks-section" class="inner-section">
+      </div>
+      <button type="button" onclick="addOutputBlock()">
+        Add Output Block</button><br /><br />
+    </div>
+
+    <div class="section">
+      <h2>Jupyter Server Config</h2>
+      TO DO
+      <div class="sub-section">
+        <label for="custom-css">Custom CSS:</label>
+        <input type="checkbox" id="custom-css" name="jupyter_server_config" /><br />
+      </div>
+    </div>
+
+    <button type="button" onclick="generateYAML()">Preview YAML</button>
+    <button type="button" onclick="downloadYAML()">Download YAML</button>
+  </form>
+
+  <div id="yaml-preview"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+  <script>
+    /* TO DO
+
+Have a list of jupyterlab extensions suggested (checkbox) also be able to add more via a text entry box
+(add extra checkox items and set checkbox); this are then used to generate a requirements-sytem.txt file
+that should be added to the imports.
+
+In form, have a button to generate access token from module presentation and code
+      */
+
+    function generateUUID() {
+      // Generate a UUIDv4
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    function disableButton(button) {
+      button.disabled = true;  // Disable the button
+      button.classList.add('disabled-button');  // Add the disabled button style
+    }
+
+    // Default list of pip packages
+    const pip_system_recommended_packages = ["jupyter", "scipy"];
+    const pip_user_recommended_packages = ["jupyter", "scipy"];
+
+    // Function to dynamically add contributors based on pip_system_recommended_packages
+    /*
+    function addPipPackageCheckboxes(typ) {
+      const container = document.getElementById(`pip-${typ}-package-checkboxes`);
+
+      pip_system_recommended_packages.forEach(package => {
+        const label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" name="checkbox-${typ}-${package}" value="${package}"> ${package}<br>`;
+        container.appendChild(label);
+      });
+    }
+    addPipPackageCheckboxes("system");
+    addPipPackageCheckboxes("user");
+    */
+    function addPipPackageButtons(typ) {
+      const container = document.getElementById(`pip-${typ}-package-buttons`);
+
+      pip_system_recommended_packages.forEach(pkg => {
+        const button = document.createElement("button");
+        button.innerText = pkg;
+        button.type = "button";
+        button.addEventListener('click', function () {
+          disableButton(this);
+          addPipPackage(typ, pkg);
+        });
+        container.appendChild(button);
+      });
+    }
+    addPipPackageButtons("system");
+    addPipPackageButtons("user");
+
+    let yamlString = "";
+
+
+    function showImportTextarea() {
+      document.getElementById("yaml-import-container").style.display =
+        "block";
+    }
+
+    function hideImportTextarea() {
+      document.getElementById("yaml-import-container").style.display = "none";
+    }
+
+    // Utility function to create a tag element
+    function createTag(text, container) {
+      text = text.trim();
+      // Check if a tag with the same text already exists
+      const existingTags = container.getElementsByClassName("tag");
+      for (let i = 0; i < existingTags.length; i++) {
+        if (existingTags[i].textContent.replace("x", "").trim() === text) {
+          return; // Tag already exists, do not add a new one
+        }
+      }
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = text;
+
+      const deleteBtn = document.createElement("span");
+      deleteBtn.className = "delete";
+      deleteBtn.textContent = "x";
+      deleteBtn.onclick = () => container.removeChild(tag);
+
+      tag.appendChild(deleteBtn);
+      container.appendChild(tag);
+    }
+
+    // Add APT build packages
+    function addAptPackages(typ) {
+      const input = document.getElementById(`apt-${typ}-input`);
+      const packages = input.value.split(/[\s,]+/).filter(Boolean);
+      const container = document.getElementById(`apt-${typ}-packages`);
+
+      packages.forEach((pkg) => createTag(pkg, container));
+      input.value = "";
+    }
+
+    // Add services
+    function addService() {
+      const input = document.getElementById(`services-input`);
+      const services = input.value.split(/[\s,]+/).filter(Boolean);
+      const container = document.getElementById(`service-names`);
+
+      services.forEach((srvc) => createTag(srvc, container));
+      input.value = "";
+    }
+
+    // Add PIP packages
+    function addPipPackage(typ, pkg) {
+      const container = document.getElementById(`pip-${typ}-packages`);
+      createTag(pkg, container);
+    }
+
+    function addPipPackages(typ) {
+      const input = document.getElementById(`pip-${typ}-input`);
+      const packages = input.value.split(/[\s,]+/).filter(Boolean);
+      const container = document.getElementById(`pip-${typ}-packages`);
+
+      packages.forEach((pkg) => createTag(pkg, container));
+      input.value = "";
+    }
+
+    function addAptSource(container_id = '') {
+      const container = document.getElementById("sources-apt");
+      const div = document.createElement("div");
+      div.className = "apt-source";
+      if (container_id) div.id = container_id;
+      div.innerHTML = `
+                <label>Name:</label><input type="text" name="apt-name"><br>
+                <label>Key URL:</label><input type="text" size=60 name="apt-key-url"><br>
+                <label>Dearmor:</label><input type="checkbox" name="apt-dearmor"><br>
+                <label>Deb URL:</label><input type="text" name="apt-deb-url" size=60 ><br>
+                <label>Deb Distribution:</label><input type="text" name="apt-distribution" size=40 ><br>
+                <label>Deb Component:</label><input type="text" name="apt-component" size=40 ><br>
+                <button type="button" class="delete-btn">Delete Source</button><br><br>
+            `;
+
+      const deleteBtn = div.querySelector(".delete-btn");
+      deleteBtn.onclick = () => container.removeChild(div);
+
+      container.appendChild(div);
+    }
+
+    function addContent() {
+      const container = document.getElementById("content-section");
+      const div = document.createElement("div");
+      div.innerHTML = `
+        <label>Source:</label><input type="text" name="content-source"><br>
+        <label>Target:</label><input type="text" name="content-target"><br>
+        <label>Overwrite:</label>
+        <select name="content-overwrite">
+            <option value="always">Always</option>
+            <option value="never">Never</option>
+        </select><br><br>
+        <button type="button" class="delete-btn">Delete Content</button><br><br>
+    `;
+      const deleteBtn = div.querySelector(".delete-btn");
+      deleteBtn.onclick = () => container.removeChild(div);
+
+      container.appendChild(div);
+    }
+
+    function addKV(container_id, typ, name = '', value = '') {
+      const container = document.getElementById(container_id);
+      const div = document.createElement("div");
+      // typ: env or arg
+      div.innerHTML = `
+    <label>Name:</label><input type="text" size=40 name="${typ}-name" value="${name}"><br>
+    <label>Value:</label><input type="text" size=40 name="${typ}-value" value="${value}"><br>
+    <button type="button" class="delete-btn">Delete</button><br><br>
+  `;
+
+      const deleteBtn = div.querySelector('.delete-btn');
+      deleteBtn.onclick = () => container.removeChild(div);
+
+      container.appendChild(div);
+    }
+
+    function addArgument(name = '', value = '') {
+      addKV('arguments-section', "arg", name = name, value = value)
+    }
+
+    function addEnvironment(name = '', value = '') {
+      addKV('environment-section', "env", name = name, value = value)
+    }
+
+    function addScript() {
+      const container = document.getElementById("scripts-section");
+      const div = document.createElement("div");
+      div.innerHTML = `
+          <label>Stage:</label> <select name="script-stage-type">
+            <option value="build">Build</option>
+            <option value="deploy">Deploy</option>
+        </select><br><br>
+        <label>Name:</label><input type="text" name="script-name"><br><br>
+              <label>Commands:</label><textarea rows="5" cols="60" name="script-commands"></textarea><br><br>
+              <button type="button" class="delete-btn">Delete</button><br><br>
+          `;
+
+
+      const deleteBtn = div.querySelector('.delete-btn');
+      deleteBtn.onclick = () => container.removeChild(div);
+      container.appendChild(div);
+    }
+
+    function addOutputBlock(containerId = "output-blocks-section", stage = 'build', block = '', weight = '') {
+      const container = document.getElementById(containerId);
+      const div = document.createElement("div");
+      div.innerHTML = `
+    <label>Stage:</label>
+    <select name="output-block-stage">
+      <option value="build" ${stage === 'build' ? 'selected' : ''}>Build</option>
+      <option value="deploy" ${stage === 'deploy' ? 'selected' : ''}>Deploy</option>
+    </select><br><br>
+    <label>Block:</label><input type="text" size=60 name="output-block-block" value="${block}"><br><br>
+    <label>Weight:</label><input type="text" name="output-block-weight" value="${weight}"><br><br>
+    <button type="button" class="delete-btn">Delete</button><br><br>
+  `;
+
+      const deleteBtn = div.querySelector('.delete-btn');
+      deleteBtn.onclick = () => container.removeChild(div);
+
+      container.appendChild(div);
+    }
+
+
+    function addWebApp(container_id = '') {
+      const container = document.getElementById("web-apps-section");
+      const div = document.createElement("div");
+      div.className = "web-app"
+      if (container_id) div.id = container_id
+      div.innerHTML = `
+              <label>Path:</label><input type="text" size=60 name="webapp-path"><br>
+              <label>Command:</label><textarea name="webapp-command"></textarea><br>
+              <label>Port:</label><input type="text" name="webapp-port"><br>
+              <label>Timeout:</label><input type="text" name="webapp-timeout"><br>
+              <label>Environment:</label><textarea name="webapp-environment"></textarea><br><br>
+              <label>Launcher enabled:</label><input type="checkbox" class="webapp-launcher-enabled" /><br><br>
+               <div class="launcher-options" style="display: none;">
+              <label>Launcher icon path:</label><input type="text" size=60 name="webapp-launcher-icon-path"><br><br>
+              <label>Launcher title:</label><input type="text" size=40 name="webapp-launcher-title"><br><br>
+              <span>Launcher category:
+  <label>
+    <input type="radio" name="webapp-launcher-category" value="Notebook" checked>
+    Notebook
+  </label>
+  <label>
+    <input type="radio" name="webapp-launcher-category" value="Console">
+    Console
+  </label>
+  <label>
+    <input type="radio" name="webapp-launcher-category" value="Other">
+    Other
+  </label></span>
+  </div><br><br>
+  <button type="button" class="delete-btn">Delete</button><br><br>
+          `;
+
+      const deleteBtn = div.querySelector('.delete-btn');
+      deleteBtn.onclick = () => container.removeChild(div);
+      container.appendChild(div);
+
+      setupLauncherToggle(div);
+    }
+
+    function setupLauncherToggle(webAppDiv) {
+      const checkbox = webAppDiv.querySelector('.webapp-launcher-enabled');
+      const launcherOptions = webAppDiv.querySelector('.launcher-options');
+
+      checkbox.addEventListener('change', function () {
+        launcherOptions.style.display = this.checked ? 'block' : 'none';
+      });
+    }
+
+    function getDynamicPackages() {
+      const dynamicPackages = [];
+      document.querySelectorAll('.tag-item').forEach(item => {
+        dynamicPackages.push(item.textContent.trim());
+      });
+      return dynamicPackages;
+    }
+
+    function generateYAML() {
+      const form = document.getElementById("settingsForm");
+      const formData = new FormData(form);
+      const yamlData = {};
+
+      // Module section
+      yamlData.module = {
+        code: formData.get("module-code"),
+        presentation: formData.get("module-presentation"),
+      };
+
+      // Image section
+      yamlData.image = {
+        base: formData.get("image-base"),
+        user: formData.get("image-user"),
+      };
+
+      // Packs section
+      yamlData.packs = {};
+      formData.getAll("packs").forEach((pack) => {
+        yamlData.packs[pack] = {}
+      });
+
+      // Sources section
+      yamlData.sources = {
+        apt: [],
+      };
+      document.querySelectorAll("#sources-apt > div").forEach((div) => {
+        const source = {
+          name: div.querySelector('[name="apt-name"]').value,
+          key_url: div.querySelector('[name="apt-key-url"]').value,
+          dearmor: div.querySelector('[name="apt-dearmor"]').checked,
+          deb: {
+            url: div.querySelector('[name="apt-deb-url"]').value,
+            distribution: div.querySelector('[name="apt-distribution"]').value,
+            component: div.querySelector('[name="apt-component"]').value
+          }
+        };
+        yamlData.sources.apt.push(source);
+      });
+
+      // Server section
+      yamlData.server = {
+        access_token: formData.get("access-token"),
+        default_path: formData.get("default-path"),
+      };
+
+      // Packages section
+      yamlData.packages = {
+        apt: { build: [], deploy: [] },
+        pip: { system: [], user: [] },
+      };
+      document
+        .querySelectorAll("#apt-build-packages .tag")
+        .forEach((tag) =>
+          yamlData.packages.apt.build.push(tag.textContent.slice(0, -1))
+        );
+      document
+        .querySelectorAll("#apt-deploy-packages .tag")
+        .forEach((tag) =>
+          yamlData.packages.apt.deploy.push(tag.textContent.slice(0, -1))
+        );
+
+      // Checkboxes for pip system checkbox packages
+      /*
+      pip_system_recommended_packages.forEach(package => {
+        const checkbox = document.querySelector(`[name="checkbox-system-${package}"]`);
+        if (checkbox.checked) {
+          yamlData.packages.pip.system.push(package);
+        }
+      })
+      */
+      document.querySelectorAll("#pip-system-packages .tag").forEach((tag) => {
+        const package = tag.textContent.slice(0, -1);
+        const pipPackage = { name: package };
+        yamlData.packages.pip.system.push(package);
+      });
+      /*
+      pip_user_recommended_packages.forEach(package => {
+        const checkbox = document.querySelector(`[name="checkbox-user-${package}"]`);
+        if (checkbox.checked) {
+          yamlData.packages.pip.user.push(package);
+        }
+      })
+      */
+      pip_system_requirements = formData.get("pip-system-requirements");
+      if (pip_system_requirements) {
+        const pipRequirements = { name: pip_system_requirements, type: 'requirements.txt' };
+        yamlData.packages.pip.system.push(pipRequirements);
+      }
+
+      document.querySelectorAll("#pip-user-packages .tag").forEach((tag) => {
+        const package = tag.textContent.slice(0, -1);
+        yamlData.packages.pip.user.push(package);
+      });
+
+      pip_user_requirements = formData.get("pip-user-requirements");
+      if (pip_user_requirements) {
+        const pipRequirements = { name: pip_user_requirements, type: 'requirements.txt' };
+        yamlData.packages.pip.user.push(pipRequirements);
+      }
+
+      // Content section
+      yamlData.content = [];
+      document.querySelectorAll("#content-section > div").forEach((div) => {
+        const content = {};
+        const source = div.querySelector('[name="content-source"]').value;
+        if (source) content.source = source
+        const target = div.querySelector('[name="content-target"]').value;
+        if (target) content.target = target;
+        const overwrite = div.querySelector('[name="content-overwrite"]').value;
+        if (overwrite) content.overwrite = overwrite;
+        yamlData.content.push(content);
+      });
+
+      // Environment section
+      yamlData.environment = [];
+      document
+        .querySelectorAll("#environment-section > div")
+        .forEach((div) => {
+          const env = {
+            name: div.querySelector('[name="env-name"]').value,
+            value: div.querySelector('[name="env-value"]').value,
+          };
+          yamlData.environment.push(env);
+        });
+
+      // Arguments section
+      yamlData.arguments = [];
+      document
+        .querySelectorAll("#arguments-section > div")
+        .forEach((div) => {
+          const env = {
+            name: div.querySelector('[name="arg-name"]').value,
+            value: div.querySelector('[name="arg-value"]').value,
+          };
+          yamlData.arguments.push(env);
+        });
+
+      // Scripts section
+      yamlData.scripts = [];
+      document.querySelectorAll("#scripts-section > div").forEach((div) => {
+        const script = {
+          stage: div.querySelector('[name="script-stage-type"]').value,
+          commands: div.querySelector('[name="script-commands"]').value,
+        };
+        const script_name = div.querySelector('[name="script-name"]').value
+        if (script_name) {
+          script.name = script_name;
+        }
+        yamlData.scripts.push(script);
+      });
+
+      // Output blocks section
+      yamlData.output_blocks = {};
+      document
+        .querySelectorAll("#output-blocks-section > div")
+        .forEach((div) => {
+          const block_stage = div.querySelector('[name="output-block-stage"]').value;
+          if (!(block_stage in yamlData.output_blocks)) {
+            yamlData.output_blocks[block_stage] = [];
+          }
+          const block = {
+            block: div.querySelector('[name="output-block-block"]').value,
+            weight: parseInt(div.querySelector('[name="output-block-weight"]').value),
+          };
+          yamlData.output_blocks[block_stage].push(block);
+        });
+
+      // Web apps section
+      function getWebAppData(containerElement) {
+        const webAppData = {};
+
+        // Get input values
+        webAppData.path = containerElement.querySelector('[name="webapp-path"]').value;
+        webAppData.options = {
+        }
+        const command = containerElement.querySelector('[name="webapp-command"]').value;
+        if (command) webAppData.options.command = command.split(" ");
+        const port = containerElement.querySelector('[name="webapp-port"]').value;
+        if (port) webAppData.options.port = port;
+        const timeout = containerElement.querySelector('[name="webapp-timeout"]').value;
+        if (timeout) webAppData.options.timeout = timeout;
+        const environment = containerElement.querySelector('[name="webapp-environment"]').value;
+        if (environment)  webAppData.options.environment = environment;
+
+        // Get checkbox value
+        webAppData.launcher = {
+          enabled: containerElement.querySelector('.webapp-launcher-enabled').checked
+        };
+
+        // Only include launcher details if enabled
+        if (webAppData.launcher.enabled) {
+          const icon_path = containerElement.querySelector('[name="webapp-launcher-icon-path"]').value;
+          if (icon_path) webAppData.launcher.icon_path = icon_path;
+          const title = containerElement.querySelector('[name="webapp-launcher-title"]').value;
+          if (title) webAppData.launcher.title = title;
+
+          // Get selected radio button value
+          const selectedCategory = containerElement.querySelector('input[name="webapp-launcher-category"]:checked');
+          webAppData.launcher.category = selectedCategory ? selectedCategory.value : null;
+        }
+
+        return webAppData;
+      }
+      yamlData.web_apps = [];
+      document.querySelectorAll("#web-apps-section > div").forEach((div) => {
+        const webApp = getWebAppData(div)
+        yamlData.web_apps.push(webApp);
+      });
+
+      // Jupyter server config section
+      yamlData.jupyter_server_config = {
+        custom_css: formData.get("custom-css") === "on",
+      };
+
+      // Services section
+      yamlData.services = [];
+      document
+        .querySelectorAll("#service-names .tag")
+        .forEach((tag) =>
+          yamlData.services.push(tag.textContent.slice(0, -1))
+        );
+
+      yamlString = jsyaml.dump(yamlData);
+      // Preview the YAML
+      document.getElementById("yaml-preview").textContent = yamlString;
+    }
+
+    function downloadYAML(yamlString) {
+      if (!yamlString) {
+        alert("Please preview the YAML first.");
+        return;
+      }
+
+      const blob = new Blob([yamlString], { type: "text/yaml" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "settings.yaml";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function importYAML() {
+      const textarea = document.getElementById("yaml-import-textarea");
+      const yamlContent = textarea.value;
+
+      //
+      const yamlData = jsyaml.load(yamlContent);
+      populateForm(yamlData, true);
+      hideImportTextarea();
+      //} catch (e) {
+      // alert("Invalid YAML format.");
+      //}
+    }
+    function populateForm(yamlData, preclear = false) {
+      // Populate module section
+      if (yamlData.module) {
+        document.querySelector('[name="module-code"]').value =
+          yamlData.module.code || null;
+        document.querySelector('[name="module-presentation"]').value =
+          yamlData.module.presentation || null;
+      }
+
+      // Populate image section
+      if (yamlData.image) {
+        document.querySelector('[name="image-base"]').value =
+          yamlData.image.base || null;
+        document.querySelector('[name="image-user"]').value =
+          yamlData.image.user || null;
+      }
+
+      // Populate apt sources section
+      if (yamlData.sources) {
+        if (yamlData.sources.apt) {
+          yamlData.sources.apt.forEach((apt, index) => {
+            const apt_id = generateUUID();
+            addAptSource(apt_id);
+            const container = document.getElementById(apt_id)
+            container.querySelector('[name="apt-name"]').value =
+              apt.name || null;
+            container.querySelector('[name="apt-key-url"]').value =
+              apt.key_url || null;
+            if (apt.dearmor) container.querySelector('[name="apt-dearmor"]').checked = true
+            if (apt.deb) {
+              container.querySelector('[name="apt-deb-url"]').value =
+                apt.deb.url || null;
+              container.querySelector('[name="apt-distribution"]').value =
+                apt.deb.distribution || null;
+              container.querySelector('[name="apt-component"]').value =
+                apt.deb.component || null;
+            }
+          })
+        }
+      }
+
+      const aptBuildContainer = document.getElementById("apt-build-packages");
+      const aptDeployContainer = document.getElementById(
+        "apt-deploy-packages"
+      );
+      const pipSystemTagsContainer = document.getElementById("pip-system-packages");
+      const pipUserTagsContainer = document.getElementById("pip-user-packages");
+      if (preclear) {
+        aptBuildContainer.innerHTML = "";
+        aptDeployContainer.innerHTML = "";
+        pipUserTagsContainer.innerHTML = '';
+        pipUserTagsContainer.innerHTML = '';
+      }
+      if (yamlData.packages) {
+        if (yamlData.packages.apt) {
+          // Populate packages section (apt.build)
+          if (yamlData.packages.apt.build) {
+            yamlData.packages.apt.build.forEach((pkg) =>
+              createTag(pkg, aptBuildContainer)
+            );
+          }
+
+          // Populate packages section (apt.deploy)
+          if (yamlData.packages.apt.deploy) {
+            yamlData.packages.apt.deploy.forEach((pkg) =>
+              createTag(pkg, aptDeployContainer)
+            );
+          }
+        }
+        // Populate packages section (pip)
+        if (yamlData.packages.pip) {
+          if (yamlData.packages.pip.system) {
+            // Populate packages section (pip system)
+            yamlData.packages.pip.system.forEach((pkg) =>
+              createTag(pkg, pipSystemTagsContainer)
+            );
+          }
+          if (yamlData.packages.pip.user) {
+            // Populate packages section (pip user)
+            yamlData.packages.pip.user.forEach((pkg) =>
+              createTag(pkg, pipUserTagsContainer)
+            );
+          }
+        }
+
+      }
+
+      // Populate services section
+      const serviceContainer = document.getElementById(
+        "service-names"
+      );
+      if (preclear) serviceContainer.innerHTML = '';
+      if (yamlData.services) {
+        yamlData.services.forEach((srvc) => createTag(srvc, serviceContainer));
+      }
+
+      // Populate environment section
+      if (yamlData.environment) {
+        if (preclear) document.getElementById("environment-section").innerHTML = ''; // Clear existing content
+        yamlData.environment.forEach(arg => {
+          addEnvironment(arg.name, arg.value);
+        });
+      }
+
+      // Populate arguments section
+      if (yamlData.arguments) {
+        if (preclear) document.getElementById("arguments-section").innerHTML = ''; // Clear existing content
+        yamlData.arguments.forEach(arg => {
+          addArgument(arg.name, arg.value);
+        });
+      }
+
+      // Populate output blocks section
+      if (yamlData.output_blocks) {
+        const output_block_id = "output-blocks-section"
+        const outputBlocksContainer = document.getElementById(output_block_id);
+        if (preclear) outputBlocksContainer.innerHTML = ''; // Clear existing content
+        for (const [stage, blocks] of Object.entries(yamlData.output_blocks)) {
+          blocks.forEach(block => {
+            addOutputBlock(output_block_id, stage, block.block, block.weight);
+          });
+        }
+      }
+
+      // Populate web-apps section
+      if (yamlData.web_apps) {
+        yamlData.web_apps.forEach((webApp, index) => {
+          const webapp_id = generateUUID();
+          addWebApp(webapp_id);
+          const app = document.getElementById(webapp_id)
+          app.querySelector('[name="webapp-path"]').value =
+            webApp.path || null;
+          app.querySelector('[name="webapp-command"]').value = webApp.options.command.join(" ") || [];
+          app.querySelector('[name="webapp-port"]').value = webApp.options.port || null;
+          app.querySelector('[name="webapp-timeout"]').value = webApp.options.timeout || null;
+          app.querySelector('[name="webapp-environment"]').value = webApp.options.environment || null;
+          if (webApp.launcher) {
+            app.querySelector('.webapp-launcher-enabled').checked = true;
+            app.querySelector('.webapp-launcher-enabled').dispatchEvent(new Event('change'));
+            app.querySelector('[name="webapp-launcher-icon-path"]').value = webApp.launcher.icon_path || null;
+            app.querySelector('[name="webapp-launcher-title"]').value = webApp.launcher.title || null;
+            if (webApp.launcher.category) app.querySelector(`input[name="webapp-launcher-category"][value="${webApp.launcher.category}"]`).checked = true;
+          }
+        })
+      }
+
+      // Populate packs section
+      if (yamlData.packs) {
+        const packs = document.querySelectorAll('input[name="packs"]');
+        if (preclear) packs.forEach(pack => {
+          pack.checked = false;
+        });
+        for (pack in yamlData.packs) {
+          document.querySelector(`[id="${pack}"]`).checked = true
+        }
+      }
+
+      // Populate jupyter_server_config section GIVES A NULL
+      if (yamlData.jupyter_server_config) {
+        document.querySelector('[id="custom-css"]').checked =
+          yamlData.jupyter_server_config.custom_css || false;
+      }
+
+      // Populate content section
+      const container = document.getElementById("content-section");
+      if (preclear) container.innerHTML = "";
+      if (yamlData.content && yamlData.content.length > 0) {
+        yamlData.content.forEach((content) => {
+          const div = document.createElement("div");
+          div.innerHTML = `
+                <label>Source:</label><input type="text" name="content-source" value="${content.source
+            }"><br>
+                <label>Target:</label><input type="text" name="content-target" value="${content.target
+            }"><br>
+                <label>Overwrite:</label>
+                <select name="content-overwrite">
+                    <option value="always" ${content.overwrite === "always" ? "selected" : ""
+            }>Always</option>
+                    <option value="never" ${content.overwrite === "never" ? "selected" : ""
+            }>Never</option>
+                </select><br><br>
+            `;
+          container.appendChild(div);
+        });
+      }
+    }
+
+    function addReadyMadeOUsefuldatascipy() {
+      const datascipy_yaml = `
+packages:
+  pip:
+    user:
+      - pandas
+      - scipy
+      - seaborn
+      - xlrd
+      - openpyxl
+`
+      const yamlData = jsyaml.load(datascipy_yaml);
+      populateForm(yamlData, false);
+    }
+
+    function addReadyMadeOUsefulgeopy() {
+      const geopy_yaml = `
+packages:
+  apt:
+    build:
+      - gdal-bin
+      - libgdal-dev
+    deploy:
+      - gdal-bin
+      - libgdal-dev
+  pip:
+    user:
+      - geopandas
+      - fiona
+      - Shapely
+      - geopy
+      - folium
+      - descartes
+`
+      const yamlData = jsyaml.load(geopy_yaml);
+      populateForm(yamlData, false);
+    }
+    function addReadyMadeOUsefulJL() {
+      const ouseful_jl_yaml = `
+packages:
+  pip:
+    system:
+      - ou-tm351-jl-extensions>=0.2.8
+`
+      const yamlData = jsyaml.load(ouseful_jl_yaml);
+      populateForm(yamlData, false);
+      
+    }
+
+    function addReadyMadePostgres() {
+      const postgres_yaml = `
+packages:
+  apt:
+    deploy:
+    - postgresql
+  pip:
+    user:
+      - jupysql
+      - psycopg2-binary
+      - pgspecial
+      - SQLAlchemy
+      - schemadisplay-magic>=0.0.7
+scripts:
+  - stage: deploy
+    commands:
+      - sed -e "s/[#]\?listen_addresses = .*/listen_addresses = '*'/g" -i "/etc/postgresql/$PG_VERSION/main/postgresql.conf"
+  
+services:
+  - postgresql
+environment:
+  - name: PG_VERSION
+    value: "15"
+  - name: PGDATA
+    value: /var/lib/postgresql/$PG_VERSION/main
+  - name: POSTGRES_USER
+    value: postgres
+  - name: POSTGRES_PASSWORD
+    value: postgres
+  - name: POSTGRES_DB
+    value: oudb
+  - name: PLOOMBER_STATS_ENABLED
+    value: "false"
+  - name: PLOOMBER_VERSION_CHECK_DISABLED
+    value: "false"
+`
+      const yamlData = jsyaml.load(postgres_yaml);
+      populateForm(yamlData, false);
+    }
+
+    function addReadyMadeOpenRefine() {
+const openrefine_yaml=`
+packages:
+  apt:
+    deploy:
+      - openjdk-17-jre 
+      - openjdk-17-jre-headless
+scripts:
+  - stage: build
+    commands:
+      - wget -q -O openrefine-\${OPENREFINE_VERSION}.tar.gz https://github.com/OpenRefine/OpenRefine/releases/download/\${OPENREFINE_VERSION}/openrefine-linux-\${OPENREFINE_VERSION}.tar.gz
+      - tar xzf openrefine-\${OPENREFINE_VERSION}.tar.gz
+      - mv openrefine-\${OPENREFINE_VERSION} $OPENREFINE_PATH
+environment:
+  - name: OPENREFINE_VERSION
+    value: 3.8.0
+  - name: OPENREFINE_PATH
+    value: "/var/openrefine"
+output_blocks:
+  deploy:
+    - block: COPY --from=base /var/openrefine /var/openrefine
+      weight: 2000
+web_apps:
+  - path: openrefine
+    options:
+      command:
+        - /var/openrefine/refine
+        - -i
+        - "127.0.0.1"
+        - -p
+        - "{port}"
+        - -d
+        - /home/ou/TM351-24J/openrefine
+        - -H
+        - "*"
+        - -x
+        - refine.display.new.version.notice=false
+      timeout: 120
+      new_browser_tab: true
+      launcher_entry:
+        title: OpenRefine
+        icon_path: /var/ou/icons/openrefine.svg
+`
+      const yamlData = jsyaml.load(openrefine_yaml);
+      populateForm(yamlData, false);
+    }
+
+    function addReadyMadeMongo() {
+      const mongo_yaml = `
+sources:
+  apt:
+    - name: mongodb
+      key_url: https://www.mongodb.org/static/pgp/server-7.0.asc
+      dearmor: True
+      deb:
+        url: https://repo.mongodb.org/apt/ubuntu
+        distribution: jammy/mongodb-org/7.0
+        component: multiverse
+packages:
+  apt:
+    deploy:
+      - mongodb-org
+  pip:
+    user:
+      - pymongo
+services:
+  - mongod
+environment:
+  - name: MONGO_DB_PATH
+    value: /var/db/data/mongo
+`
+      const yamlData = jsyaml.load(mongo_yaml);
+      populateForm(yamlData, false);
+    }
+
+  </script>
+</body>
+
+</html>
