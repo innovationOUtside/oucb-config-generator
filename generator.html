@@ -1188,6 +1188,19 @@ packages:
   pip:
     user:
       - pymongo
+content:
+  - source: ./db_setup/mongodb-org/mongod
+    target: /etc/init.d/mongod
+    overwrite: always
+  - source: ./db_setup/mongodb-org/mongod.conf
+    target: /etc/mongod.conf
+    overwrite: always
+scripts:
+  - stage: deploy
+    commands:
+      - chmod ugo+rx /etc/init.d/mongod
+      - cp -p /etc/mongod.conf /etc/ouseful/mongod.conf
+      - chmod u-w /etc/ouseful/mongod.conf
 services:
   - mongod
 environment:
