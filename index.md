@@ -2,6 +2,7 @@
 
 Additional guidance on working with the OU VCE (Open University Vritual Computing Environment) `container-builder` ([documentation](https://docs.ocl.open.ac.uk/container-builder/v3/)).
 
+- [container lifecycle](./container_lifecycle.html): overview of the lifeycle of a `container-builder` built container;
 - [container-builder configuration file generator](./generator.html): HTML form based UI for generating and editing `container-builder` configuration files;
 - [`web_app` example](./webapp_example.md): walkthrough of installing and configuring a simple web app (Open Refine) using `container-builder`;
 - [customised Jupyter UI example](./customised_jupyter_ui_example.md): example configuration for installing various JupyterLab extensions to improve accessibility and user experience of teaching and learning materials;
