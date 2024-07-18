@@ -77,7 +77,7 @@
     <p>Convenience tool for helping and manage <tt>ContainerConfig.yaml</tt> files.</p>
     <p>Official OU Container builder docs <a href="https://docs.ocl.open.ac.uk/container-builder/v3/">here</a>.</p>
   </div>
-  If you have a pre-existing YAML file, you can seed this from from it (this will clear all previous form elements):
+  If you have a pre-existing YAML file, you can seed this form from it (this will clear all previous form elements):
   <button type="button" onclick="showImportTextarea()">Import YAML</button>
   <div id="yaml-import-container">
     <textarea id="yaml-import-textarea" cols=60 rows=10 placeholder="Paste your YAML here"></textarea><br />
@@ -1140,7 +1140,11 @@ environment:
 output_blocks:
   deploy:
     - block: COPY --from=base /var/openrefine /var/openrefine
-      weight: 2000
+      weight: 2333
+content:
+  - source: ./icons/openrefine.svg
+    target: /var/ou/icons/openrefine.svg
+    overwrite: always
 web_apps:
   - path: openrefine
     options:
