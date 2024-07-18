@@ -4,19 +4,26 @@ The `container-builder` is capable of installing applications that run a service
 
 Defining a service via the `services` configuration option also ensure that the user has permissions to `start`, `stop` and `restart` the service.
 
-TO DO - specify sudo config explicitly
+Definiong a service via `services` sets the following user permissions on the service:
+
+```bash
+{state['image']['user']} ALL=(root) NOPASSWD: /usr/sbin/service {service} start
+{state['image']['user']}ALL=(root) NOPASSWD: /usr/sbin/service {service} restart
+{state['image']['user']} ALL=(root) NOPASSWD: /usr/sbin/service {service} stop
+```
 
 ## Installing a PostgreSQL Database
 
-To minimally run a PostgreSQL database service inside a VCE built using `container-builder`, we need to install the database and modify a databse server configuration setting.
-
-TO DO
+To minimally run a PostgreSQL database service inside a VCE built using `container-builder`, we need to install the database and modify a databse server configuration setting. We can also take the opportunity to load in some Python packages to support the user in making connections to the database and working with it.
 
 ```yaml
 packages:
   apt:
     deploy:
     - postgresql
+  # The pip packages are not required as part of the installation
+  # but they do make working with the database from 
+  # a Python environment easier
   pip:
     user:
       - jupysql
@@ -26,11 +33,20 @@ packages:
       - schemadisplay-magic>=0.0.7
 scripts:
   - stage: deploy
+    # Modisy the config file to listen to 
+    # public incoming IP addresses
     commands:
       - sed -e "s/[#]\?listen_addresses = .*/listen_addresses = '*'/g" -i "/etc/postgresql/$PG_VERSION/main/postgresql.conf"
   
+# Aff postrgresql as a service
 services:
   - postgresql
+
+# Add some convenience environment variables
+# We should probably try to install a specified major version
+# of the postgresql package, rather than guessing at it here.
+# The PLOOMBER environment settings disable the data
+# collection embedded in the jupysql (SQL magic) package. 
 environment:
   - name: PG_VERSION
     value: "15"
@@ -49,8 +65,6 @@ environment:
 ```
 
 ## Installing a MongoDB Database
-
-TO DO
 
 To minimally run a MongoDB database service inside a VCE built using `container-builder`, we need to install the database and provide in an appropriate configuration setting file. __The below example requires some external config files to be available.__
 
@@ -90,7 +104,6 @@ environment:
   - name: MONGO_DB_PATH
     value: /var/db/data/mongo
 ```
-
 
 ```bash
 #! /bin/sh
