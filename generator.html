@@ -491,13 +491,15 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
       addKV('environment-section', "env", name = name, value = value)
     }
 
-    function addScript() {
+    function addScript(container_id = '') {
       const container = document.getElementById("scripts-section");
       const div = document.createElement("div");
+      if (container_id) div.id = container_id;
       div.innerHTML = `
           <label>Stage:</label> <select name="script-stage-type">
             <option value="build">Build</option>
             <option value="deploy">Deploy</option>
+            <option value="startup">Startup</option>
         </select><br><br>
         <label>Name:</label><input type="text" name="script-name"><br><br>
               <label>Commands:</label><textarea rows="5" cols="60" name="script-commands"></textarea><br><br>
@@ -751,7 +753,7 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
           }
           const block = {
             block: div.querySelector('[name="output-block-block"]').value,
-            weight: parseInt(div.querySelector('[name="output-block-weight"]').value),
+            weight: div.querySelector('[name="output-block-weight"]').value ? parseInt(div.querySelector('[name="output-block-weight"]').value) : null,
           };
           yamlData.output_blocks[block_stage].push(block);
         });
@@ -1006,9 +1008,29 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
           yamlData.jupyter_server_config.custom_css || false;
       }
 
+      // Populate scripts section
+      const scripts = document.getElementById("scripts-section");
+      if (preclear) scripts.innerHTML = "";
+      if (yamlData.scripts && yamlData.scripts.length > 0) {
+        yamlData.scripts.forEach((script, index) => {
+          const div = document.createElement("div");
+          const script_id = generateUUID();
+          addScript(script_id);
+          const script_el = document.getElementById(script_id)
+          script_el.querySelector('[name="script-stage-type"]').value =
+            script.stage || null;
+          script_el.querySelector('[name="script-commands"]').value =
+            script.commands || null;
+          script_el.querySelector('[name="script-name"]').value =
+            script.name || null;
+
+          scripts.appendChild(div);
+        })
+      }
+
       // Populate content section
-      const container = document.getElementById("content-section");
-      if (preclear) container.innerHTML = "";
+      const content_container = document.getElementById("content-section");
+      if (preclear) content_container.innerHTML = "";
       if (yamlData.content && yamlData.content.length > 0) {
         yamlData.content.forEach((content) => {
           const div = document.createElement("div");
@@ -1025,7 +1047,7 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
             }>Never</option>
                 </select><br><br>
             `;
-          container.appendChild(div);
+          content_container.appendChild(div);
         });
       }
     }
