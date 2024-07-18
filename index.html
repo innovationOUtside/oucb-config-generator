@@ -64,8 +64,9 @@
     }
 
     .fixed-rows-textarea {
-resize: horizontal; /* Allow only horizontal resizing */
-            overflow: auto;
+      resize: horizontal;
+      /* Allow only horizontal resizing */
+      overflow: auto;
     }
   </style>
 </head>
@@ -180,7 +181,8 @@ resize: horizontal; /* Allow only horizontal resizing */
       <h2>Packages</h2>
       <div class="sub-section">
         <h3>APT Build</h3>
-        <textarea class="fixed-rows-textarea" rows=1 cols="60" id="apt-build-input" placeholder="Enter APT packages, separated by comma or space" ></textarea>
+        <textarea class="fixed-rows-textarea" rows=1 cols="60" id="apt-build-input"
+          placeholder="Enter APT packages, separated by comma or space"></textarea>
         <br><button type="button" onclick="addAptPackages('build')">
           Add Packages
         </button>
@@ -188,7 +190,8 @@ resize: horizontal; /* Allow only horizontal resizing */
       </div>
       <div class="sub-section">
         <h3>APT Deploy</h3>
-        <textarea class="fixed-rows-textarea" rows=1 cols="60" id="apt-deploy-input" placeholder="Enter APT packages, separated by comma or space" ></textarea>
+        <textarea class="fixed-rows-textarea" rows=1 cols="60" id="apt-deploy-input"
+          placeholder="Enter APT packages, separated by comma or space"></textarea>
         <br><button type="button" onclick="addAptPackages('deploy')">
           Add Packages
         </button>
@@ -197,22 +200,26 @@ resize: horizontal; /* Allow only horizontal resizing */
       <div class="sub-section">
         <h3>PIP System</h3>
         <label for="pip-system-requirements">Requirements file:</label>
-        <textarea class="fixed-rows-textarea" rows=1 cols="40" id="pip-system-requirements" name="pip-system-requirements" placeholder="Path to requirements file"></textarea><br />
-        <div id="pip-system-package-buttons">
+        <textarea class="fixed-rows-textarea" rows=1 cols="40" id="pip-system-requirements"
+          name="pip-system-requirements" placeholder="Path to requirements file"></textarea><br />
+        <div id="pip-system-package-buttons">Frequently used packages (click to add):
           <!-- Buttons will be dynamically added here -->
         </div><br>
-        <textarea class="fixed-rows-textarea" rows=1 cols="60" id="pip-system-input" placeholder="Enter PIP packages, separated by comma or space" ></textarea>
+        <textarea class="fixed-rows-textarea" rows=1 cols="60" id="pip-system-input"
+          placeholder="Enter PIP packages, separated by comma or space"></textarea>
         <br><button type="button" onclick="addPipPackages('system')">Add Packages</button>
         <div id="pip-system-packages"></div>
       </div>
       <div class="sub-section">
         <h3>PIP User</h3>
         <label for="pip-user-requirements">Requirements file:</label>
-        <textarea class="fixed-rows-textarea" rows=1 cols="40" id="pip-user-requirements" name="pip-user-requirements" placeholder="Path to requirements file"></textarea><br />
-        <div id="pip-user-package-buttons">
+        <textarea class="fixed-rows-textarea" rows=1 cols="40" id="pip-user-requirements" name="pip-user-requirements"
+          placeholder="Path to requirements file"></textarea><br />
+        <div id="pip-user-package-buttons">Frequently used packages (click to add):
           <!-- Buttons will be dynamically added here -->
         </div><br>
-        <textarea class="fixed-rows-textarea" rows=1 cols="60" id="pip-user-input" placeholder="Enter PIP packages, separated by comma or space" ></textarea>
+        <textarea class="fixed-rows-textarea" rows=1 cols="60" id="pip-user-input"
+          placeholder="Enter PIP packages, separated by comma or space"></textarea>
         <br><button type="button" onclick="addPipPackages('user')">Add Packages</button>
         <div id="pip-user-packages"></div>
       </div>
@@ -236,7 +243,7 @@ resize: horizontal; /* Allow only horizontal resizing */
     <div class="section">
       <h2>Services</h2>
       <textarea class="fixed-rows-textarea" rows=1 cols="40" id="services-input"
-        placeholder="Enter service name, or service names separated by comma or space" ></textarea><br><br>
+        placeholder="Enter service name, or service names separated by comma or space"></textarea><br><br>
       <button type="button" onclick="addService()">
         Add Service(s)
       </button>
@@ -262,6 +269,9 @@ resize: horizontal; /* Allow only horizontal resizing */
 
     <div class="section">
       <h2>Output Blocks</h2>
+      <p>Inject elements directly into the Dockerfile. <strong>Use with caution.</strong></p>
+      <p><em>See <a href="https://docs.ocl.open.ac.uk/container-builder/v3/developer/output_block_weights.html">Output
+            Block Weights</a> for documentation on allowed weight ranges.</em></p>
 
       <div id="output-blocks-section" class="inner-section">
       </div>
@@ -288,11 +298,14 @@ resize: horizontal; /* Allow only horizontal resizing */
   <script>
     /* TO DO
 
-Have a list of jupyterlab extensions suggested (checkbox) also be able to add more via a text entry box
-(add extra checkox items and set checkbox); this are then used to generate a requirements-sytem.txt file
-that should be added to the imports.
-
 In form, have a button to generate access token from module presentation and code
+
+OpenRefine requires the icon - how do we alert the user to this? or link to the actual resource?
+
+Databases may have seeding etc; this is likely to require external files; how do we package that here?
+
+Container builder does not currently natively support the migration of db data directories 
+to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sharing example scripts etc.
       */
 
     function generateUUID() {
@@ -439,8 +452,8 @@ In form, have a button to generate access token from module presentation and cod
       const container = document.getElementById("content-section");
       const div = document.createElement("div");
       div.innerHTML = `
-        <label>Source:</label><input type="text" name="content-source"><br>
-        <label>Target:</label><input type="text" name="content-target"><br>
+        <label>Source:</label><input type="text" size=60 name="content-source" placeholder="Path to local source file"><br>
+        <label>Target:</label><input type="text" size=60 name="content-target" placeholder="Path to target location in VCE""><br>
         <label>Overwrite:</label>
         <select name="content-overwrite">
             <option value="always">Always</option>
@@ -506,8 +519,8 @@ In form, have a button to generate access token from module presentation and cod
       <option value="build" ${stage === 'build' ? 'selected' : ''}>Build</option>
       <option value="deploy" ${stage === 'deploy' ? 'selected' : ''}>Deploy</option>
     </select><br><br>
-    <label>Block:</label><input type="text" size=60 name="output-block-block" value="${block}"><br><br>
-    <label>Weight:</label><input type="text" name="output-block-weight" value="${weight}"><br><br>
+    <label>Block:</label><input type="text" size=60 name="output-block-block" value="${block}" placeholder="For example: COPY --from=base /var/openrefine /var/openrefine"><br><br>
+    <label>Weight:</label><input type="text" name="output-block-weight" value="${weight}" placeholder="See docs for ranges"><br><br>
     <button type="button" class="delete-btn">Delete</button><br><br>
   `;
 
@@ -758,7 +771,7 @@ In form, have a button to generate access token from module presentation and cod
         const timeout = containerElement.querySelector('[name="webapp-timeout"]').value;
         if (timeout) webAppData.options.timeout = timeout;
         const environment = containerElement.querySelector('[name="webapp-environment"]').value;
-        if (environment)  webAppData.options.environment = environment;
+        if (environment) webAppData.options.environment = environment;
 
         // Get checkbox value
         webAppData.launcher = {
@@ -1063,7 +1076,7 @@ packages:
 `
       const yamlData = jsyaml.load(ouseful_jl_yaml);
       populateForm(yamlData, false);
-      
+
     }
 
     function addReadyMadePostgres() {
@@ -1107,7 +1120,7 @@ environment:
     }
 
     function addReadyMadeOpenRefine() {
-const openrefine_yaml=`
+      const openrefine_yaml = `
 packages:
   apt:
     deploy:
