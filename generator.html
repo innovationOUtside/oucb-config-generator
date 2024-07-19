@@ -1118,7 +1118,7 @@ scripts:
   - stage: deploy
     commands:
       - sed -e "s/[#]\?listen_addresses = .*/listen_addresses = '*'/g" -i "/etc/postgresql/$PG_VERSION/main/postgresql.conf"
-  
+      - usermod -aG users postgres
 services:
   - postgresql
 environment:

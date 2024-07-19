@@ -33,12 +33,13 @@ packages:
       - schemadisplay-magic>=0.0.7
 scripts:
   - stage: deploy
-    # Modisy the config file to listen to 
+    # Modify the config file to listen to 
     # public incoming IP addresses
+    # Add the users group to postgres group
     commands:
       - sed -e "s/[#]\?listen_addresses = .*/listen_addresses = '*'/g" -i "/etc/postgresql/$PG_VERSION/main/postgresql.conf"
-  
-# Aff postrgresql as a service
+      - usermod -aG users postgres
+# Add postrgresql as a service
 services:
   - postgresql
 

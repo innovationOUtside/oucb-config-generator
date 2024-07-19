@@ -6,6 +6,8 @@ OpenRefine can be added to a container-builder environment and exposed via short
 
 As well as the web app specification, the application itself needs to be downloaded and installed during the `build` stage, and copied over to the deployed container via an `output block`. (Documentation for recommended output block weight ranges is available via the [`container-builder` documentation](https://docs.ocl.open.ac.uk/container-builder/v3/developer/output_block_weights.html).) Operating system packages required to run the application need to be installed in the `deploy` stage. Several utility environment path variables are also set.
 
+An initilisation script that is run at startup time to ensire any required directories, etc., are available is also provided in an external file.
+
 ```yaml
 # The Open Refine application is pre-built and only needs Java to be available in the deploy stage.
 # Required Java packages are thus installed as apt.deploy packages.
@@ -24,6 +26,12 @@ environment:
     value: 3.8.0
   - name: OPENREFINE_PATH
     value: "/var/openrefine"
+
+# Add any initialisation scripts that need to run on startup
+content:
+  - source: ./webapp_init
+    target: /etc/ou_webapp
+    overwrite: always
 
 scripts:
     # The pre-built Open Refine application is downloaded and unarchived during a build step.
@@ -86,3 +94,24 @@ web_apps:
         icon_path: /var/ou/icons/openrefine.svg
 ```
 
+OpenRefine requires that a specified directory is available when it starts up, so we need to include a startup script that ensiures that the required directory is available and has appropriate permissions set.
+
+```yaml
+scripts:
+  - stage: startup
+    name: 475-initialising-openrefine-webapp
+    commands:
+      - sudo LOCAL_HOME=/home/$USER/${MODULE_CODE}-${MODULE_PRESENTATION} /etc/ou_webapp/openrefine_init.sh
+```
+
+```bash
+#! /bin/bash
+# Local path: ./webapp_init/openrefine_init.sh
+# File location: /etc/ou_webapp/openrefine_init.sh
+
+# The script should be run via sudo, added elsewhere:
+# echo "ou ALL=(ALL:ALL) NOPASSWD: /etc/ou_webapp/openrefine_init.sh" >> /etc/sudoers
+mkdir -p $LOCAL_HOME/openrefine
+chown ou:users $LOCAL_HOME/openrefine
+
+```
