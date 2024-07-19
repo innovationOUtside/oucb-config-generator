@@ -1,6 +1,6 @@
 # Seeded Database Example
 
-If we have installed a database into a `container-builder` builts container, we can seed the database during the deployment. This provides a user with a readymade database environment with  users, databases, tables and data available from the start.
+If we have installed a database into a `container-builder` built container, we can seed the database during the deployment. This provides a user with a readymade database environment with  users, databases, tables and data available from the start.
 
 ## PostgreSQL
 
@@ -49,7 +49,7 @@ INSERT INTO quickdemo VALUES(2,'That',345);
 ALTER TABLE quickdemo OWNER TO testuser;
 ```
 
-Example bash script to create datbases, etc.
+Example bash script to create databases, etc.
 
 ```bash
 #!/bin/bash
@@ -71,7 +71,7 @@ createdb -O tm351_student tm351_hospital
 
 If we have a MongoDB environment installed, we can seed the database by restoring a previously created database using the following recipe.
 
-*Note that this requires access to a database archive file, eg in `./db_setup/init_db/mongodb/db.tar.bz2`.*
+*Note that this requires access to a database archive file, e.g. in `./db_setup/init_db/mongodb/db.tar.bz2`.*
 
 ```yaml
 packages:

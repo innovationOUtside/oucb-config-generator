@@ -4,7 +4,7 @@ The `container-builder` is capable of installing applications that run a service
 
 Defining a service via the `services` configuration option also ensure that the user has permissions to `start`, `stop` and `restart` the service.
 
-Definiong a service via `services` sets the following user permissions on the service:
+Defining a service via `services` sets the following user permissions on the service:
 
 ```bash
 {state['image']['user']} ALL=(root) NOPASSWD: /usr/sbin/service {service} start
@@ -14,7 +14,7 @@ Definiong a service via `services` sets the following user permissions on the se
 
 ## Installing a PostgreSQL Database
 
-To minimally run a PostgreSQL database service inside a VCE built using `container-builder`, we need to install the database and modify a databse server configuration setting. We can also take the opportunity to load in some Python packages to support the user in making connections to the database and working with it.
+To minimally run a PostgreSQL database service inside a VCE built using `container-builder`, we need to install the database and modify a database server configuration setting. We can also take the opportunity to load in some Python packages to support the user in making connections to the database and working with it.
 
 ```yaml
 packages:

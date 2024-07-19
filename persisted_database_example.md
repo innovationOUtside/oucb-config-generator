@@ -6,7 +6,7 @@ For users running a local VCE, any changes made to the database will continue to
 
 For users using a hosted VCE, the container instance is ephemeral: a new container instance is typically created for each new user session. To persist any changes to the database, we need relocate the database data directory into the persisted directory path (e.g. on the user's `$HOME` directory path).
 
-For users working with a local VCE instance, databse files can be persisted outside of the container by reloacting the database data directory to a shared mounted directory path.
+For users working with a local VCE instance, database files can be persisted outside of the container by relocating the database data directory to a shared mounted directory path.
 
 The following recipe can be used optionally copy over database files to a location on the user `$HOME` path.
 
