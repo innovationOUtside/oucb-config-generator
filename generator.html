@@ -76,6 +76,7 @@
   <div>
     <p>Convenience tool for helping and manage <tt>ContainerConfig.yaml</tt> files.</p>
     <p>Official OU Container builder docs <a href="https://docs.ocl.open.ac.uk/container-builder/v3/">here</a>.</p>
+    <p><em><a href="https://innovationoutside.github.io/oucb-config-generator/"></a>Unofficial guidance notes</a> to complement this helper app.</em></p>
   </div>
   If you have a pre-existing YAML file, you can seed this form from it (this will clear all previous form elements):
   <button type="button" onclick="showImportTextarea()">Import YAML</button>
@@ -326,8 +327,8 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
     }
 
     // Default list of pip packages
-    const pip_system_recommended_packages = ["jupyter", "scipy"];
-    const pip_user_recommended_packages = ["jupyter", "scipy"];
+    const pip_system_recommended_packages = ["pandas", "scipy", "numpy", "matplotlib"];
+    const pip_user_recommended_packages = ["pandas", "scipy", "numpy", "matplotlib"];
 
     // Function to dynamically add contributors based on pip_system_recommended_packages
     /*
