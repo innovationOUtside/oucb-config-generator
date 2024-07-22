@@ -76,7 +76,8 @@
   <div>
     <p>Convenience tool for helping and manage <tt>ContainerConfig.yaml</tt> files.</p>
     <p>Official OU Container builder docs <a href="https://docs.ocl.open.ac.uk/container-builder/v3/">here</a>.</p>
-    <p><em><a href="https://innovationoutside.github.io/oucb-config-generator/"></a>Unofficial guidance notes</a> to complement this helper app.</em></p>
+    <p><em><a href="https://innovationoutside.github.io/oucb-config-generator/"></a>Unofficial guidance notes</a> to
+        complement this helper app.</em></p>
   </div>
   If you have a pre-existing YAML file, you can seed this form from it (this will clear all previous form elements):
   <button type="button" onclick="showImportTextarea()">Import YAML</button>
@@ -673,7 +674,7 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
       const pip_system_requirements = formData.get("pip-system-requirements");
       const pip_user_requirements = formData.get("pip-user-requirements");
 
-      if (packages_apt_build_list.length>0 || packages_apt_deploy_list.length > 0 || packages_pip_system_list.length > 0 || packages_pip_user_list.length > 0 || pip_system_requirements || pip_user_requirements) {
+      if (packages_apt_build_list.length > 0 || packages_apt_deploy_list.length > 0 || packages_pip_system_list.length > 0 || packages_pip_user_list.length > 0 || pip_system_requirements || pip_user_requirements) {
         yamlData.packages = {};
         if (packages_apt_build_list || packages_apt_deploy_list) {
           yamlData.packages.apt = {};
@@ -865,7 +866,7 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
 
       // Jupyter server config section
       //yamlData.jupyter_server_config = {
-        //custom_css: formData.get("custom-css") === "on",
+      //custom_css: formData.get("custom-css") === "on",
       //};
 
       // Services section
@@ -933,6 +934,8 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
 
       // Populate apt sources section
       if (yamlData.sources) {
+        const apt_sources = document.getElementById("sources-apt");
+        if (preclear) apt_sources.innerHTML = '';
         if (yamlData.sources.apt) {
           yamlData.sources.apt.forEach((apt, index) => {
             const apt_id = generateUUID();
