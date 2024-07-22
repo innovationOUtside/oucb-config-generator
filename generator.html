@@ -1013,7 +1013,6 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
       if (preclear) scripts.innerHTML = "";
       if (yamlData.scripts && yamlData.scripts.length > 0) {
         yamlData.scripts.forEach((script, index) => {
-          const div = document.createElement("div");
           const script_id = generateUUID();
           addScript(script_id);
           const script_el = document.getElementById(script_id)
@@ -1023,8 +1022,6 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
             script.commands || null;
           script_el.querySelector('[name="script-name"]').value =
             script.name || null;
-
-          scripts.appendChild(div);
         })
       }
 
