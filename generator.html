@@ -283,8 +283,6 @@
       <h2>Jupyter Server Config</h2>
       TO DO
       <div class="sub-section">
-        <label for="custom-css">Custom CSS:</label>
-        <input type="checkbox" id="custom-css" name="jupyter_server_config" /><br />
       </div>
     </div>
 
@@ -608,169 +606,215 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
       const yamlData = {};
 
       // Module section
-      yamlData.module = {
-        code: formData.get("module-code"),
-        presentation: formData.get("module-presentation"),
-      };
+      const module_code = formData.get("module-code");
+      const module_presentation = formData.get("module-presentation");
+      if (module_code || module_presentation) {
+        yamlData.module = {};
+        yamlData.module.code = module_code;
+        yamlData.module.presentation = module_presentation;
+      }
 
       // Image section
-      yamlData.image = {
-        base: formData.get("image-base"),
-        user: formData.get("image-user"),
-      };
+      const image_base = formData.get("image-base");
+      const image_user = formData.get("image-user");
+      if (image_base || image_user) {
+        yamlData.image = {};
+        if (image_base) yamlData.image.base = formData.get("image-base");
+        if (image_user) yamlData.image.user = formData.get("image-user");
+      }
 
       // Packs section
-      yamlData.packs = {};
-      formData.getAll("packs").forEach((pack) => {
-        yamlData.packs[pack] = {}
-      });
+      if (formData.getAll("packs").length > 0) {
+        yamlData.packs = {};
+        formData.getAll("packs").forEach((pack) => {
+          yamlData.packs[pack] = {}
+        });
+      }
 
       // Sources section
-      yamlData.sources = {
-        apt: [],
-      };
-      document.querySelectorAll("#sources-apt > div").forEach((div) => {
-        const source = {
-          name: div.querySelector('[name="apt-name"]').value,
-          key_url: div.querySelector('[name="apt-key-url"]').value,
-          dearmor: div.querySelector('[name="apt-dearmor"]').checked,
-          deb: {
-            url: div.querySelector('[name="apt-deb-url"]').value,
-            distribution: div.querySelector('[name="apt-distribution"]').value,
-            component: div.querySelector('[name="apt-component"]').value
-          }
+      let sources_list = document.querySelectorAll("#sources-apt > div");
+      if (sources_list.length > 0) {
+        yamlData.sources = {
+          apt: [],
         };
-        yamlData.sources.apt.push(source);
-      });
+        sources_list.forEach((div) => {
+          const source = {
+            name: div.querySelector('[name="apt-name"]').value,
+            key_url: div.querySelector('[name="apt-key-url"]').value,
+            dearmor: div.querySelector('[name="apt-dearmor"]').checked,
+            deb: {
+              url: div.querySelector('[name="apt-deb-url"]').value,
+              distribution: div.querySelector('[name="apt-distribution"]').value,
+              component: div.querySelector('[name="apt-component"]').value
+            }
+          };
+          yamlData.sources.apt.push(source);
+        });
+      }
 
       // Server section
-      yamlData.server = {
-        access_token: formData.get("access-token"),
-        default_path: formData.get("default-path"),
+      const server_access_token = formData.get("access-token");
+      const server_default_path = formData.get("default-path");
+      if (server_access_token || server_default_path) {
+        yamlData.server = {};
+        yamlData.server.access_token = server_access_token;
+        yamlData.server.default_path = server_default_path;
       };
 
       // Packages section
-      yamlData.packages = {
-        apt: { build: [], deploy: [] },
-        pip: { system: [], user: [] },
-      };
-      document
-        .querySelectorAll("#apt-build-packages .tag")
-        .forEach((tag) =>
-          yamlData.packages.apt.build.push(tag.textContent.slice(0, -1))
-        );
-      document
-        .querySelectorAll("#apt-deploy-packages .tag")
-        .forEach((tag) =>
-          yamlData.packages.apt.deploy.push(tag.textContent.slice(0, -1))
-        );
 
-      // Checkboxes for pip system checkbox packages
-      /*
-      pip_system_recommended_packages.forEach(package => {
-        const checkbox = document.querySelector(`[name="checkbox-system-${package}"]`);
-        if (checkbox.checked) {
-          yamlData.packages.pip.system.push(package);
+      const packages_apt_build_list = document
+        .querySelectorAll("#apt-build-packages .tag");
+      const packages_apt_deploy_list = document
+        .querySelectorAll("#apt-deploy-packages .tag");
+      const packages_pip_system_list = document.querySelectorAll("#pip-system-packages .tag");
+      const packages_pip_user_list = document.querySelectorAll("#pip-user-packages .tag")
+      const pip_system_requirements = formData.get("pip-system-requirements");
+      const pip_user_requirements = formData.get("pip-user-requirements");
+
+      if (packages_apt_build_list.length>0 || packages_apt_deploy_list.length > 0 || packages_pip_system_list.length > 0 || packages_pip_user_list.length > 0 || pip_system_requirements || pip_user_requirements) {
+        yamlData.packages = {};
+        if (packages_apt_build_list || packages_apt_deploy_list) {
+          yamlData.packages.apt = {};
+          if (packages_apt_build_list) yamlData.packages.apt.build = [];
+          if (packages_apt_deploy_list) yamlData.packages.apt.deploy = [];
+
+          packages_apt_build_list.forEach((tag) =>
+            yamlData.packages.apt.build.push(tag.textContent.slice(0, -1))
+          );
+
+          packages_apt_deploy_list.forEach((tag) =>
+            yamlData.packages.apt.deploy.push(tag.textContent.slice(0, -1))
+          );
         }
-      })
-      */
-      document.querySelectorAll("#pip-system-packages .tag").forEach((tag) => {
-        const package = tag.textContent.slice(0, -1);
-        const pipPackage = { name: package };
-        yamlData.packages.pip.system.push(package);
-      });
-      /*
-      pip_user_recommended_packages.forEach(package => {
-        const checkbox = document.querySelector(`[name="checkbox-user-${package}"]`);
-        if (checkbox.checked) {
-          yamlData.packages.pip.user.push(package);
+        if (packages_pip_system_list || packages_pip_user_list || pip_system_requirements || pip_user_requirements) {
+          yamlData.packages.pip = {};
+          if (packages_pip_system_list || pip_system_requirements)
+            yamlData.packages.pip.system = [];
+          if (packages_pip_user_list || pip_user_requirements)
+            yamlData.packages.pip.user = [];
+          // Checkboxes for pip system checkbox packages
+          /*
+          pip_system_recommended_packages.forEach(package => {
+            const checkbox = document.querySelector(`[name="checkbox-system-${package}"]`);
+            if (checkbox.checked) {
+              yamlData.packages.pip.system.push(package);
+            }
+          })
+          */
+          packages_pip_system_list.forEach((tag) => {
+            const package = tag.textContent.slice(0, -1);
+            const pipPackage = { name: package };
+            yamlData.packages.pip.system.push(package);
+          });
+          /*
+          pip_user_recommended_packages.forEach(package => {
+            const checkbox = document.querySelector(`[name="checkbox-user-${package}"]`);
+            if (checkbox.checked) {
+              yamlData.packages.pip.user.push(package);
+            }
+          })
+          */
+
+          if (pip_system_requirements) {
+            const pipRequirements = { name: pip_system_requirements, type: 'requirements.txt' };
+            yamlData.packages.pip.system.push(pipRequirements);
+          }
+
+          packages_pip_user_list.forEach((tag) => {
+            const package = tag.textContent.slice(0, -1);
+            yamlData.packages.pip.user.push(package);
+          });
+
+
+          if (pip_user_requirements) {
+            const pipRequirements = { name: pip_user_requirements, type: 'requirements.txt' };
+            yamlData.packages.pip.user.push(pipRequirements);
+          }
         }
-      })
-      */
-      pip_system_requirements = formData.get("pip-system-requirements");
-      if (pip_system_requirements) {
-        const pipRequirements = { name: pip_system_requirements, type: 'requirements.txt' };
-        yamlData.packages.pip.system.push(pipRequirements);
       }
-
-      document.querySelectorAll("#pip-user-packages .tag").forEach((tag) => {
-        const package = tag.textContent.slice(0, -1);
-        yamlData.packages.pip.user.push(package);
-      });
-
-      pip_user_requirements = formData.get("pip-user-requirements");
-      if (pip_user_requirements) {
-        const pipRequirements = { name: pip_user_requirements, type: 'requirements.txt' };
-        yamlData.packages.pip.user.push(pipRequirements);
-      }
-
       // Content section
-      yamlData.content = [];
-      document.querySelectorAll("#content-section > div").forEach((div) => {
-        const content = {};
-        const source = div.querySelector('[name="content-source"]').value;
-        if (source) content.source = source
-        const target = div.querySelector('[name="content-target"]').value;
-        if (target) content.target = target;
-        const overwrite = div.querySelector('[name="content-overwrite"]').value;
-        if (overwrite) content.overwrite = overwrite;
-        yamlData.content.push(content);
-      });
+      const content_list = document.querySelectorAll("#content-section > div");
+      if (content_list.length > 0) {
+        yamlData.content = [];
+        content_list.forEach((div) => {
+          const content = {};
+          const source = div.querySelector('[name="content-source"]').value;
+          if (source) content.source = source
+          const target = div.querySelector('[name="content-target"]').value;
+          if (target) content.target = target;
+          const overwrite = div.querySelector('[name="content-overwrite"]').value;
+          if (overwrite) content.overwrite = overwrite;
+          yamlData.content.push(content);
+        });
+      }
 
       // Environment section
-      yamlData.environment = [];
-      document
-        .querySelectorAll("#environment-section > div")
-        .forEach((div) => {
+      const environment_list = document
+        .querySelectorAll("#environment-section > div");
+      if (environment_list.length > 0) {
+        yamlData.environment = [];
+
+        environment_list.forEach((div) => {
           const env = {
             name: div.querySelector('[name="env-name"]').value,
             value: div.querySelector('[name="env-value"]').value,
           };
           yamlData.environment.push(env);
         });
+      }
 
       // Arguments section
-      yamlData.arguments = [];
-      document
+      const arguments_list = document
         .querySelectorAll("#arguments-section > div")
-        .forEach((div) => {
+      if (arguments_list.length > 0) {
+        yamlData.arguments = [];
+        arguments_list.forEach((div) => {
           const env = {
             name: div.querySelector('[name="arg-name"]').value,
             value: div.querySelector('[name="arg-value"]').value,
           };
           yamlData.arguments.push(env);
         });
+      }
 
       // Scripts section
-      yamlData.scripts = [];
-      document.querySelectorAll("#scripts-section > div").forEach((div) => {
-        const script = {
-          stage: div.querySelector('[name="script-stage-type"]').value,
-          commands: div.querySelector('[name="script-commands"]').value,
-        };
-        const script_name = div.querySelector('[name="script-name"]').value
-        if (script_name) {
-          script.name = script_name;
-        }
-        yamlData.scripts.push(script);
-      });
+      const scripts_list = document.querySelectorAll("#scripts-section > div");
+      if (scripts_list.length > 0) {
+        yamlData.scripts = [];
+        scripts_list.forEach((div) => {
+          const script = {
+            stage: div.querySelector('[name="script-stage-type"]').value,
+            commands: div.querySelector('[name="script-commands"]').value,
+          };
+          const script_name = div.querySelector('[name="script-name"]').value
+          if (script_name) {
+            script.name = script_name;
+          }
+          yamlData.scripts.push(script);
+        });
+      }
 
       // Output blocks section
-      yamlData.output_blocks = {};
-      document
-        .querySelectorAll("#output-blocks-section > div")
-        .forEach((div) => {
-          const block_stage = div.querySelector('[name="output-block-stage"]').value;
-          if (!(block_stage in yamlData.output_blocks)) {
-            yamlData.output_blocks[block_stage] = [];
-          }
-          const block = {
-            block: div.querySelector('[name="output-block-block"]').value,
-            weight: div.querySelector('[name="output-block-weight"]').value ? parseInt(div.querySelector('[name="output-block-weight"]').value) : null,
-          };
-          yamlData.output_blocks[block_stage].push(block);
+      const output_blocks_list = document
+        .querySelectorAll("#output-blocks-section > div");
+      if (output_blocks_list.length > 0) {
+        yamlData.output_blocks = {};
+        document
+          .querySelectorAll("#output-blocks-section > div")
+          .forEach((div) => {
+            const block_stage = div.querySelector('[name="output-block-stage"]').value;
+            if (!(block_stage in yamlData.output_blocks)) {
+              yamlData.output_blocks[block_stage] = [];
+            }
+            const block = {
+              block: div.querySelector('[name="output-block-block"]').value,
+              weight: div.querySelector('[name="output-block-weight"]').value ? parseInt(div.querySelector('[name="output-block-weight"]').value) : null,
+            };
+            yamlData.output_blocks[block_stage].push(block);
 
-        });
+          });
+      }
 
       // Web apps section
       function getWebAppData(containerElement) {
@@ -808,24 +852,31 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
 
         return webAppData;
       }
-      yamlData.web_apps = [];
-      document.querySelectorAll("#web-apps-section > div").forEach((div) => {
-        const webApp = getWebAppData(div)
-        yamlData.web_apps.push(webApp);
-      });
+
+      const web_apps_list = document.querySelectorAll("#web-apps-section > div");
+      if (web_apps_list.length > 0) {
+        yamlData.web_apps = [];
+        web_apps_list.forEach((div) => {
+          const webApp = getWebAppData(div)
+          yamlData.web_apps.push(webApp);
+        });
+      }
 
       // Jupyter server config section
-      yamlData.jupyter_server_config = {
-        custom_css: formData.get("custom-css") === "on",
-      };
+      //yamlData.jupyter_server_config = {
+        //custom_css: formData.get("custom-css") === "on",
+      //};
 
       // Services section
-      yamlData.services = [];
-      document
-        .querySelectorAll("#service-names .tag")
-        .forEach((tag) =>
+      const services_list = document
+        .querySelectorAll("#service-names .tag");
+      if (services_list.length > 0) {
+        yamlData.services = [];
+
+        services_list.forEach((tag) =>
           yamlData.services.push(tag.textContent.slice(0, -1))
         );
+      }
 
       yamlString = jsyaml.dump(yamlData);
       // Preview the YAML
@@ -988,7 +1039,7 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
 
       // Populate web-apps section
       if (yamlData.web_apps) {
-        if (preclear) document.getElementById("web-apps-section").innerHTML='';
+        if (preclear) document.getElementById("web-apps-section").innerHTML = '';
         yamlData.web_apps.forEach((webApp, index) => {
           const webapp_id = generateUUID();
           addWebApp(webapp_id);
@@ -1022,8 +1073,7 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
 
       // Populate jupyter_server_config section GIVES A NULL
       if (yamlData.jupyter_server_config) {
-        document.querySelector('[id="custom-css"]').checked =
-          yamlData.jupyter_server_config.custom_css || false;
+
       }
 
       // Populate scripts section
