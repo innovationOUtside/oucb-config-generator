@@ -971,6 +971,7 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
 
       // Populate web-apps section
       if (yamlData.web_apps) {
+        if (preclear) document.getElementById("web-apps-section").innerHTML='';
         yamlData.web_apps.forEach((webApp, index) => {
           const webapp_id = generateUUID();
           addWebApp(webapp_id);
@@ -982,7 +983,7 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
           app.querySelector('[name="webapp-timeout"]').value = webApp.options.timeout || null;
           app.querySelector('[name="webapp-environment"]').value = webApp.options.environment || null;
           if (webApp.launcher) {
-            app.querySelector('.webapp-launcher-enabled').checked = true;
+            app.querySelector('.webapp-launcher-enabled').checked = webApp.launcher.enabled;
             app.querySelector('.webapp-launcher-enabled').dispatchEvent(new Event('change'));
             app.querySelector('[name="webapp-launcher-icon-path"]').value = webApp.launcher.icon_path || null;
             app.querySelector('[name="webapp-launcher-title"]').value = webApp.launcher.title || null;
