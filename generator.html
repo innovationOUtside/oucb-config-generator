@@ -290,12 +290,18 @@
 
     <button type="button" onclick="generateYAML()">Preview YAML</button>
     <button type="button" onclick="downloadYAML()">Download YAML</button>
+    <button type="button" onclick="roundTripTest()">Roundtrip test </button>
   </form>
 
   <div id="yaml-preview"></div>
 
+  <div id="diffOutput"></div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
   <script>
+  <script src="https://cdn.jsdelivr.net/npm/diff@5.0.0/dist/diff.min.js"></script>
+
+  <script type="text/javascript">
     /* TO DO
 
 In form, have a button to generate access token from module presentation and code
@@ -590,6 +596,7 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
     }
 
     function generateYAML() {
+    function generateYAML(return_yaml = false) {
       const form = document.getElementById("settingsForm");
       const formData = new FormData(form);
       const yamlData = {};
@@ -756,6 +763,7 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
             weight: div.querySelector('[name="output-block-weight"]').value ? parseInt(div.querySelector('[name="output-block-weight"]').value) : null,
           };
           yamlData.output_blocks[block_stage].push(block);
+
         });
 
       // Web apps section
@@ -816,6 +824,9 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
       yamlString = jsyaml.dump(yamlData);
       // Preview the YAML
       document.getElementById("yaml-preview").textContent = yamlString;
+
+      // If required, return yaml string
+      if (return_yaml) return yamlString;
     }
 
     function downloadYAML(yamlString) {
@@ -1050,6 +1061,49 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
       }
     }
 
+    // Round Trip Test
+
+    function roundTripTest() {
+      // Generate yaml string from from form
+      const yamlString = generateYAML(return_yaml = true);
+
+      // Populate form from yaml string
+      var importarea = document.getElementById('yaml-import-textarea');
+      // Set the value of the textarea
+      importarea.value = yamlString;
+      importYAML();
+
+      // Regnerate yaml string from from form
+      const yamlString2 = generateYAML(return_yaml = true);
+
+      // Diff code from docs: https://www.npmjs.com/package/diff
+      // Clear diff output
+      document.getElementById('diffOutput').innerHTML = '';
+      // Compare strings
+      const diff = Diff.diffChars(yamlString, yamlString2),
+        display = document.getElementById('diffOutput'),
+        fragment = document.createDocumentFragment();
+
+      diff.forEach((part) => {
+        // green for additions, red for deletions
+        // grey for common parts
+        const green = '#1CE815';
+        const grey = '#E8E8E8';
+        const color = part.added ? green :
+          part.removed ? 'red' : grey;
+        span = document.createElement('span');
+        span.style.color = color;
+        span.appendChild(document
+          .createTextNode(part.value));
+        fragment.appendChild(span);
+      });
+
+      display.appendChild(fragment);
+    }
+
+
+
+    // Readymades
     function addReadyMadeOUsefuldatascipy() {
       const datascipy_yaml = `
 packages:
