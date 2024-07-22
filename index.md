@@ -1,6 +1,6 @@
 # OU Container Builder ContainerConfig.yaml Generator
 
-Increasing numbers of OU modules deploy a hosted virtual computing environment (VCE) to students using containers built using the OU `container-builder` ([documentation](https://docs.ocl.open.ac.uk/container-builder/v3/)) tool ([documentation](https://docs.ocl.open.ac.uk/container-builder/v3/)).
+Increasing numbers of OU modules deploy a hosted virtual computing environment (VCE) to students using containers built using the OU `container-builder` tool ([documentation](https://docs.ocl.open.ac.uk/container-builder/v3/)).
 
 Deployed environments provide students with a web based user environment such as Jupyter Lab, Jupyter notebooks, or VS Code, as well as access to arbitrary other web applications, along with persistent storage on OU managed servers.
 
