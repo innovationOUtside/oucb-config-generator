@@ -380,7 +380,15 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
       // Check if a tag with the same text already exists
       const existingTags = container.getElementsByClassName("tag");
       for (let i = 0; i < existingTags.length; i++) {
-        if (existingTags[i].textContent.replace("x", "").trim() === text) {
+        let lastChild = existingTags[i].lastChild;
+        var tagval = existingTags[i].textContent.trim();
+        // Check if the last child is a span with the class "delete"
+        if (lastChild && lastChild.nodeType === 1 && lastChild.classList.contains('delete')) {
+          existingTags[i].removeChild(lastChild);
+          tagval = existingTags[i].textContent.trim();
+          existingTags[i].appendChild(lastChild);
+        }
+        if (text === tagval) {
           return; // Tag already exists, do not add a new one
         }
       }
