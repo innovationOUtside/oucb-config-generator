@@ -447,11 +447,11 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
       if (container_id) div.id = container_id;
       div.innerHTML = `
                 <label>Name:</label><input type="text" name="apt-name"><br>
-                <label>Key URL:</label><input type="text" size=60 name="apt-key-url"><br>
+                <label>Key URL:</label><input type="text" size="60" name="apt-key-url"><br>
                 <label>Dearmor:</label><input type="checkbox" name="apt-dearmor"><br>
-                <label>Deb URL:</label><input type="text" name="apt-deb-url" size=60 ><br>
-                <label>Deb Distribution:</label><input type="text" name="apt-distribution" size=40 ><br>
-                <label>Deb Component:</label><input type="text" name="apt-component" size=40 ><br>
+                <label>Deb URL:</label><input type="text" name="apt-deb-url" size="60" ><br>
+                <label>Deb Distribution:</label><input type="text" name="apt-distribution" size="40" ><br>
+                <label>Deb Component:</label><input type="text" name="apt-component" size="40" ><br>
                 <button type="button" class="delete-btn">Delete Source</button><br><br>
             `;
 
@@ -461,12 +461,13 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
       container.appendChild(div);
     }
 
+    // Add content
     function addContent() {
       const container = document.getElementById("content-section");
       const div = document.createElement("div");
       div.innerHTML = `
-        <label>Source:</label><input type="text" size=60 name="content-source" placeholder="Path to local source file"><br>
-        <label>Target:</label><input type="text" size=60 name="content-target" placeholder="Path to target location in VCE""><br>
+        <label>Source:</label><input type="text" size="60" name="content-source" placeholder="Path to local source file"><br>
+        <label>Target:</label><input type="text" size="60" name="content-target" placeholder="Path to target location in VCE""><br>
         <label>Overwrite:</label>
         <select name="content-overwrite">
             <option value="always">Always</option>
@@ -485,8 +486,8 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
       const div = document.createElement("div");
       // typ: env or arg
       div.innerHTML = `
-    <label>Name:</label><input type="text" size=40 name="${typ}-name" value="${name}"><br>
-    <label>Value:</label><input type="text" size=40 name="${typ}-value" value="${value}"><br>
+    <label>Name:</label><input type="text" size="40" name="${typ}-name" value="${name}"><br>
+    <label>Value:</label><input type="text" size="40" name="${typ}-value" value="${value}"><br>
     <button type="button" class="delete-btn">Delete</button><br><br>
   `;
 
@@ -534,7 +535,7 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
       <option value="build" ${stage === 'build' ? 'selected' : ''}>Build</option>
       <option value="deploy" ${stage === 'deploy' ? 'selected' : ''}>Deploy</option>
     </select><br><br>
-    <label>Block:</label><input type="text" size=60 name="output-block-block" value="${block}" placeholder="For example: COPY --from=base /var/openrefine /var/openrefine"><br><br>
+    <label>Block:</label><input type="text" size="60" name="output-block-block" value="${block}" placeholder="For example: COPY --from=base /var/openrefine /var/openrefine"><br><br>
     <label>Weight:</label><input type="text" name="output-block-weight" value="${weight}" placeholder="See docs for ranges"><br><br>
     <button type="button" class="delete-btn">Delete</button><br><br>
   `;
@@ -552,15 +553,15 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
       div.className = "web-app"
       if (container_id) div.id = container_id
       div.innerHTML = `
-              <label>Path:</label><input type="text" size=60 name="webapp-path"><br>
+              <label>Path:</label><input type="text" size="60" name="webapp-path"><br>
               <label>Command:</label><textarea name="webapp-command"></textarea><br>
               <label>Port:</label><input type="text" name="webapp-port"><br>
               <label>Timeout:</label><input type="text" name="webapp-timeout"><br>
               <label>Environment:</label><textarea name="webapp-environment"></textarea><br><br>
               <label>Launcher enabled:</label><input type="checkbox" class="webapp-launcher-enabled" /><br><br>
                <div class="launcher-options" style="display: none;">
-              <label>Launcher icon path:</label><input type="text" size=60 name="webapp-launcher-icon-path"><br><br>
-              <label>Launcher title:</label><input type="text" size=40 name="webapp-launcher-title"><br><br>
+              <label>Launcher icon path:</label><input type="text" size="60" name="webapp-launcher-icon-path"><br><br>
+              <label>Launcher title:</label><input type="text" size="40" name="webapp-launcher-title"><br><br>
               <span>Launcher category:
   <label>
     <input type="radio" name="webapp-launcher-category" value="Notebook" checked>
