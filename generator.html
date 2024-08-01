@@ -78,6 +78,8 @@
     <p>Official OU Container builder docs <a href="https://docs.ocl.open.ac.uk/container-builder/v3/">here</a>.</p>
     <p><em><a href="https://innovationoutside.github.io/oucb-config-generator/">Unofficial guidance notes</a> to
         complement this helper app.</em></p>
+        <p>Experimental Python validator for container builder v3 YAML configuration files
+        <a href="https://gist.github.com/psychemedia/cd2425975ffc1d87bf8cb3c4df264fca">available here</a>.</p>
   </div>
   If you have a pre-existing YAML file, you can seed this form from it (this will clear all previous form elements):
   <button type="button" onclick="showImportTextarea()">Import YAML</button>
@@ -1241,6 +1243,7 @@ packages:
       - schemadisplay-magic>=0.0.7
 scripts:
   - stage: deploy
+    name: fettle postgres config
     commands:
       - sed -e "s/[#]\?listen_addresses = .*/listen_addresses = '*'/g" -i "/etc/postgresql/$PG_VERSION/main/postgresql.conf"
       - usermod -aG users postgres
@@ -1275,6 +1278,7 @@ packages:
       - openjdk-17-jre-headless
 scripts:
   - stage: build
+    name: install open refine
     commands:
       - wget -q -O openrefine-\${OPENREFINE_VERSION}.tar.gz https://github.com/OpenRefine/OpenRefine/releases/download/\${OPENREFINE_VERSION}/openrefine-linux-\${OPENREFINE_VERSION}.tar.gz
       - tar xzf openrefine-\${OPENREFINE_VERSION}.tar.gz
@@ -1344,6 +1348,7 @@ content:
     overwrite: always
 scripts:
   - stage: deploy
+    name: fettle mongo setup
     commands:
       - chmod ugo+rx /etc/init.d/mongod
       - cp -p /etc/mongod.conf /etc/ouseful/mongod.conf

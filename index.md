@@ -19,6 +19,7 @@ This document reviews the lifecycle of containers built using `container-builder
 - [geocomputing example](./geocomputing_example.md): example of build requirements when installing geocomputing Python packages with operating system package dependencies;
 - [database service example](database_service_example.md): example of installing a database and running a database service;
 - [seeded database example](./seeded_database_example.md): example of seeding a database with data in a deployed environment;
-- [persisted database example](./persisted_database_example.md): example of how to persist database data directories in a VCE persistent file store or shared volume.
+- [persisted database example](./persisted_database_example.md): example of how to persist database data directories in a VCE persistent file store or shared volume;
+- experimental validator for container builder v3 YAML configuration files [here](https://gist.github.com/psychemedia/cd2425975ffc1d87bf8cb3c4df264fca).
 
 *If you have other particular use cases in mind, or examples you would like to share via these pages, please email `tony.hirst@open.ac.uk`*.
