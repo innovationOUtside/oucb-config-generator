@@ -183,7 +183,9 @@
 
     <div class="section">
       <h2>Sources</h2>
+      <p>If you want to load packages in from non-default, non-standard package repositiores / sources, add the soruce details here.</p>
       <h3>APT</h3>
+      <p>Source details for non-standard Linux packages sources.</p>
       <div id="sources-apt" class="inner-section">
       </div>
       <button type="button" onclick="addAptSource()">Add APT Source</button>
@@ -191,8 +193,10 @@
 
     <div class="section">
       <h2>Packages</h2>
+      <p>Specify packages that should be installed into the container image.</p>
       <div class="sub-section">
         <h3>APT Build</h3>
+        <p>Build image Linux packages.</p>
         <textarea class="fixed-rows-textarea" rows=1 cols="60" id="apt-build-input"
           placeholder="Enter APT packages, separated by comma or space"></textarea>
         <br><button type="button" onclick="addAptPackages('build')">
@@ -202,6 +206,7 @@
       </div>
       <div class="sub-section">
         <h3>APT Deploy</h3>
+        <p>Deplyment image Linux packages.</p>
         <textarea class="fixed-rows-textarea" rows=1 cols="60" id="apt-deploy-input"
           placeholder="Enter APT packages, separated by comma or space"></textarea>
         <br><button type="button" onclick="addAptPackages('deploy')">
@@ -211,6 +216,7 @@
       </div>
       <div class="sub-section">
         <h3>PIP System</h3>
+        <p>Python system packages (e.g. non-user modifiable packages used by Jupyter server environment)</p>
         <label for="pip-system-requirements">Requirements file:</label>
         <textarea class="fixed-rows-textarea" rows=1 cols="40" id="pip-system-requirements"
           name="pip-system-requirements" placeholder="Path to requirements file"></textarea><br />
@@ -224,6 +230,7 @@
       </div>
       <div class="sub-section">
         <h3>PIP User</h3>
+        <p>Global user environment Python packages (e.g. Jupyter default Python kernel environment).</p>
         <label for="pip-user-requirements">Requirements file:</label>
         <textarea class="fixed-rows-textarea" rows=1 cols="40" id="pip-user-requirements" name="pip-user-requirements"
           placeholder="Path to requirements file"></textarea><br />
@@ -240,6 +247,7 @@
 
     <div class="section">
       <h2>Web Apps</h2>
+      <p>Pre-configured, proxied, web applications.</p>
       <div id="web-apps-section" class="inner-section">
       </div>
       <button type="button" onclick="addWebApp()">Add Web App</button><br />
@@ -247,6 +255,7 @@
 
     <div class="section">
       <h2>Scripts</h2>
+      <p>Other installation scripts (use a separate script for each separate task; e.g. each application download / install).</p>
       <div id="scripts-section" class="inner-section">
       </div>
       <button type="button" onclick="addScript()">Add Script</button><br>
@@ -254,6 +263,7 @@
 
     <div class="section">
       <h2>Services</h2>
+      <p>Services that should be started on start-up; the user will also be given <tt>sudo</tt> privileges for starting, stopping, restarting and checking the status of each service.</tt></p>
       <textarea class="fixed-rows-textarea" rows=1 cols="40" id="services-input"
         placeholder="Enter service name, or service names separated by comma or space"></textarea><br><br>
       <button type="button" onclick="addService()">
@@ -264,6 +274,7 @@
 
     <div class="section">
       <h2>Environment</h2>
+      <p>Custom environment variables available in the deployed container.</p>
       <div id="environment-section" class="inner-section">
       </div>
       <button type="button" onclick="addEnvironment()">
