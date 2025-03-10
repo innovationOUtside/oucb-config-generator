@@ -386,7 +386,12 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
 
     // Utility function to create a tag element
     function createTag(text, container) {
-      text = text.trim();
+      if (typeof text === 'string') {
+        text = text.trim();
+      } else {
+        console.error('Expected a string but got:', text);
+        return;
+      }
       // Check if a tag with the same text already exists
       const existingTags = container.getElementsByClassName("tag");
       for (let i = 0; i < existingTags.length; i++) {
@@ -620,7 +625,7 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
 
       // Config file version
       const oucb_version = formData.get("oucb-config-version")
-      yamlData.version = parseInt(oucb_version)
+      yamlData.version = oucb_version
 
       // Module section
       const module_code = formData.get("module-code");
@@ -679,7 +684,6 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
       };
 
       // Packages section
-
       const packages_apt_build_list = document
         .querySelectorAll("#apt-build-packages .tag");
       const packages_apt_deploy_list = document
@@ -750,6 +754,7 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
           }
         }
       }
+
       // Content section
       const content_list = document.querySelectorAll("#content-section > div");
       if (content_list.length > 0) {
@@ -977,8 +982,12 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
       const aptDeployContainer = document.getElementById(
         "apt-deploy-packages"
       );
+
       const pipSystemTagsContainer = document.getElementById("pip-system-packages");
       const pipUserTagsContainer = document.getElementById("pip-user-packages");
+           const pipSystemRequirements = document.getElementById("pip-system-requirements");
+      const pipUserRequirements = document.getElementById("pip-user-requirements");
+
       if (preclear) {
         aptBuildContainer.innerHTML = "";
         aptDeployContainer.innerHTML = "";
@@ -1005,14 +1014,25 @@ to persistent sotrage in VCE, or shared volume in local VCE. Need some way of sh
         if (yamlData.packages.pip) {
           if (yamlData.packages.pip.system) {
             // Populate packages section (pip system)
-            yamlData.packages.pip.system.forEach((pkg) =>
-              createTag(pkg, pipSystemTagsContainer)
+            yamlData.packages.pip.system.forEach((pkg) => {
+              if (typeof pkg === 'string') {
+                createTag(pkg, pipSystemTagsContainer);
+              } else if (pkg.type === 'requirements.txt') {
+                pipSystemRequirements.value = pkg.name;
+              }
+            }
             );
           }
           if (yamlData.packages.pip.user) {
             // Populate packages section (pip user)
-            yamlData.packages.pip.user.forEach((pkg) =>
-              createTag(pkg, pipUserTagsContainer)
+            yamlData.packages.pip.user.forEach((pkg) => {
+              if (typeof pkg === 'string') {
+                createTag(pkg, pipUserTagsContainer);
+              } else if (pkg.type === 'requirements.txt') {
+                pipUserRequirements.value = pkg.name;
+              }
+            }
+             
             );
           }
         }

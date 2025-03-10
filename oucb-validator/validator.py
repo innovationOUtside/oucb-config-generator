@@ -4,7 +4,7 @@ import yaml
 # Need two schemas - one for the full schema, another for partial schema
 # In the partial schema validation, all elements optional?
 oucb_schema_ = {
-    "version": int,
+    "version": '3',
     "module": {
         "code": Regex(r"[A-M]{1,5}\d{3}$"),
         "presentation": Regex(r"^\d{2}[A-M]$"),
@@ -28,16 +28,29 @@ oucb_schema_ = {
             }
         ]
     },
-    Optional("server"): {"access_token": str, "default_path": str},
+    Optional("server"): {"access_token": str, "default_path": str, "wrapper_host": str},
     Optional("packages"): {
-        Optional("apt"): {Optional("build"): list, Optional("deploy"): list},
+        Optional("apt"): {
+            Optional("core"): list,
+            Optional("build"): list,
+            Optional("deploy"): list,
+        },
         Optional("pip"): {Optional("system"): list, Optional("user"): list},
     },
     Optional("content"): [
         {"source": str, "target": str, "overwrite": Or("always", "never")}
     ],
+    Optional("arguments"): [{"name": str, "value": str}],
     Optional("environment"): [{"name": str, "value": str}],
-    Optional("scripts"): [{"stage": Or("build", "deploy"), "commands": str}],
+    Optional("scripts"): [
+        {
+            "stage": {
+                Optional("build"): {"commands": str},
+                Optional("deploy"): {"commands": str},
+                Optional("startup"): {"commands": str, ":name": str}
+            }
+        }
+    ],
     Optional("output_blocks"): {
         Optional("build"): [{"block": str, "weight": int}],
         Optional("deploy"): [{"block": str, "weight": int}],
@@ -72,4 +85,3 @@ except SchemaError as se:
     # raise se
     print(se)
 """
-
